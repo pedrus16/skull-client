@@ -1,33 +1,36 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import { OrbitControls, Sky, SoftShadows } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+
+import useMockedState from "./debug/useMockedState";
+import Game from "./game/components/Game";
+import Menu from "./lobby/components/Menu";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const state = useMockedState();
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="fixed inset-0">
+        <Canvas shadows>
+          <SoftShadows />
+          <OrbitControls
+            makeDefault
+            maxDistance={1}
+            maxPolarAngle={(Math.PI / 2) * 0.8}
+          />
+          <fog attach="fog" args={["#ebf0f2", 0, 5]} />
+          <Sky
+            distance={450000}
+            sunPosition={[0, 1, 0]}
+            inclination={0}
+            azimuth={0.25}
+          />
+          <ambientLight />
+          <pointLight position={[0, 1, 0]} castShadow />
+          <Game state={state} />
+        </Canvas>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {/* <Menu /> */}
     </>
   );
 }
