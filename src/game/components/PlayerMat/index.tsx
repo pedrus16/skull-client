@@ -1,9 +1,9 @@
 import { Box, Cylinder } from "@react-three/drei";
-import { MeshProps } from "@react-three/fiber";
+import { GroupProps } from "@react-three/fiber";
 
-const PlayerMat = (props: MeshProps) => {
+const PlayerMat = (props: GroupProps) => {
   return (
-    <mesh {...props} receiveShadow castShadow>
+    <group {...props}>
       <Box
         args={[0.1, 0.003, 0.1]}
         position={[0, 0.0015, 0]}
@@ -20,7 +20,7 @@ const PlayerMat = (props: MeshProps) => {
       >
         <meshStandardMaterial color="brown" />
       </Cylinder>
-    </mesh>
+    </group>
   );
 };
 

@@ -1,17 +1,9 @@
 import { ClientGameState } from "@/bindings/ClientGameState";
-import { Circle } from "@react-three/drei";
+import computePlayerMatPosition from "@/game/utils/computePlayerMatPosition";
 
 import Ground from "../Ground";
 import PlayerMat from "../PlayerMat";
-
-function computePlayerPosition(radius: number, total: number, index: number) {
-  const ratio = index / total;
-  return {
-    x: Math.cos(Math.PI * 2 * ratio) * radius,
-    z: Math.sin(Math.PI * 2 * ratio) * radius,
-    angle: -Math.PI * 2 * ratio,
-  };
-}
+import PlayerSpotLight from "../PlayerSpotLight";
 
 interface Props {
   state: ClientGameState;
@@ -19,11 +11,12 @@ interface Props {
 
 const Game = ({ state }: Props) => {
   const radius = 0.5;
+
   return (
-    <mesh receiveShadow castShadow>
-      <Ground position={[0, 0, 0]} receiveShadow castShadow />;
+    <group>
+      <Ground position={[0, 0, 0]} />
       {state.players.map((player, index) => {
-        const { x, z, angle } = computePlayerPosition(
+        const { x, z, angle } = computePlayerMatPosition(
           radius,
           state.players.length,
           index
@@ -31,12 +24,17 @@ const Game = ({ state }: Props) => {
         return (
           <PlayerMat
             key={index}
-            position={[x, 0, z]}
+            position={[x, 0.0001, z]}
             rotation={[0, angle, 0]}
           />
         );
       })}
-    </mesh>
+      <PlayerSpotLight
+        radius={radius}
+        playerCount={state.players.length}
+        activePlayer={state.active_player}
+      />
+    </group>
   );
 };
 
