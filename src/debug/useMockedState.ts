@@ -1,5 +1,5 @@
-import { useControls } from "leva";
-import { useState } from "react";
+import { button, buttonGroup, folder, useControls } from "leva";
+import { useMemo, useState } from "react";
 
 import { ClientGameState } from "@/bindings/ClientGameState";
 
@@ -23,7 +23,7 @@ const useMockedState = () => {
     players: buildPlayers(3),
   });
 
-  useControls({
+  useControls("General", {
     Players: {
       value: 4,
       min: 3,
@@ -51,6 +51,40 @@ const useMockedState = () => {
       },
     },
   });
+
+  const playersControls = useMemo(() => {
+    const controls: Record<string, unknown> = {};
+    state.players.forEach((player, index) => {
+      controls[`Player #${index + 1}`] = folder({
+        [`#${index + 1} 1`]: buttonGroup({
+          "Place Card": () => {},
+          "Reveal Rose": () => {},
+          "Reveal Skull": () => {},
+        }),
+        [`#${index + 1} 2`]: buttonGroup({
+          Pass: () => {},
+          Discard: () => {},
+          Reset: () => {},
+        }),
+        [`#${index + 1} Bid`]: {
+          value: 0,
+          min: 0,
+          max: state.players.length * 4,
+          step: 1,
+        },
+      });
+    });
+
+    return controls;
+  }, [state.players]);
+
+  useControls(
+    "Players Controls",
+    {
+      ...playersControls,
+    },
+    [state.players]
+  );
 
   return state;
 };

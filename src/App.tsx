@@ -14,7 +14,7 @@ function App() {
         <Canvas shadows>
           <OrbitControls
             makeDefault
-            maxDistance={1}
+            maxDistance={2}
             maxPolarAngle={(Math.PI / 2) * 0.8}
           />
           {/* <fog attach="fog" args={["#ebf0f2", 0, 5]} /> */}

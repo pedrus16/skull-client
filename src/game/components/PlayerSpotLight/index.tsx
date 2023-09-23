@@ -12,14 +12,14 @@ interface Props {
 
 const PlayerSpotLight = ({ radius, playerCount, activePlayer }: Props) => {
   const target = useRef<any>();
-  const [{ pos }] = useSpring(() => {
+  const [{ position }] = useSpring(() => {
     const { x, z } = computePlayerMatPosition(
       radius,
       playerCount,
       activePlayer
     );
 
-    return { pos: [x, 0, z], config: config.gentle };
+    return { position: [x, 0, z], config: config.gentle };
   }, [playerCount, activePlayer]);
 
   return (
@@ -38,7 +38,7 @@ const PlayerSpotLight = ({ radius, playerCount, activePlayer }: Props) => {
         position={[0, 1, 0]}
         target={target.current}
       />
-      <animated.mesh ref={target} position={pos} />
+      <animated.group ref={target} position={position} />
     </>
   );
 };
