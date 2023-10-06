@@ -1,4 +1,4 @@
-import { button, buttonGroup, folder, useControls } from "leva";
+import { buttonGroup, folder, useControls } from "leva";
 import { useMemo, useState } from "react";
 
 import { ClientGameState } from "@/bindings/ClientGameState";
