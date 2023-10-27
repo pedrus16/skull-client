@@ -18,13 +18,13 @@ function App() {
             maxPolarAngle={(Math.PI / 2) * 0.8}
           />
           {/* <fog attach="fog" args={["#ebf0f2", 0, 5]} /> */}
-          {/* <Sky
+          <Sky
             distance={450000}
             sunPosition={[0, 1, 0]}
             inclination={0}
             azimuth={0.25}
-          /> */}
-          <ambientLight intensity={2.5} />
+          />
+          <ambientLight intensity={0.5} />
           <directionalLight intensity={1.5} position={[0, 1, 0]} castShadow />
           <Game state={state} />
         </Canvas>

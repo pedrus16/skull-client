@@ -1,3 +1,4 @@
+import { produce } from "immer";
 import { buttonGroup, folder, useControls } from "leva";
 import { useMemo, useState } from "react";
 
@@ -23,48 +24,87 @@ const useMockedState = () => {
     players: buildPlayers(3),
   });
 
-  useControls("General", {
-    Players: {
-      value: 4,
-      min: 3,
-      max: 12,
-      step: 1,
-      onChange(value) {
-        setState({
-          active_player: 0,
-          own_skull: "InHand",
-          phase: "Preparation",
-          players: buildPlayers(value),
-        });
+  useControls(
+    "General",
+    {
+      Players: {
+        value: 4,
+        min: 3,
+        max: 12,
+        step: 1,
+        onChange(value) {
+          setState({
+            active_player: 0,
+            own_skull: "InHand",
+            phase: "Preparation",
+            players: buildPlayers(value),
+          });
+        },
+      },
+      "Active Player": {
+        value: 0,
+        min: 0,
+        max: state.players.length - 1,
+        step: 1,
+        onChange(value) {
+          setState((prev) =>
+            produce(prev, (draft) => {
+              draft.active_player = value;
+            })
+          );
+        },
       },
     },
-    "Active Player": {
-      value: 0,
-      min: 0,
-      max: 12,
-      step: 1,
-      onChange(value) {
-        setState((prev) => ({
-          ...prev,
-          active_player: value,
-        }));
-      },
-    },
-  });
+    [state.players.length]
+  );
 
   const playersControls = useMemo(() => {
     const controls: Record<string, unknown> = {};
     state.players.forEach((player, index) => {
       controls[`Player #${index + 1}`] = folder({
         [`#${index + 1} 1`]: buttonGroup({
-          "Place Card": () => {},
-          "Reveal Rose": () => {},
-          "Reveal Skull": () => {},
+          "Place Card": () => {
+            setState((prev) =>
+              produce(prev, (draft) => {
+                draft.players[index].placed_cards += 1;
+              })
+            );
+          },
+          "Reveal Rose": () => {
+            setState((prev) =>
+              produce(prev, (draft) => {
+                draft.players[index].revealed =
+                  (draft.players[index].revealed || 0) + 1;
+              })
+            );
+          },
+          "Reveal Skull": () => {
+            setState((prev) =>
+              produce(prev, (draft) => {
+                draft.players[index].revealed =
+                  (draft.players[index].revealed || 0) + 1;
+              })
+            );
+          },
         }),
         [`#${index + 1} 2`]: buttonGroup({
           Pass: () => {},
-          Discard: () => {},
-          Reset: () => {},
+          Discard: () => {
+            setState((prev) => {
+              if (prev.players[index].hand === 0) return prev;
+
+              return produce(prev, (draft) => {
+                draft.players[index].hand -= 1;
+              });
+            });
+          },
+          Reset: () => {
+            setState((prev) =>
+              produce(prev, (draft) => {
+                draft.players[index].placed_cards = 0;
+              })
+            );
+          },
         }),
         [`#${index + 1} Bid`]: {
           value: 0,

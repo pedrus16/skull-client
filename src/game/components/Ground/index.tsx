@@ -5,7 +5,7 @@ const Ground = (props: GroupProps) => {
     <group {...props}>
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="green" />
+        <meshStandardMaterial color="#9EDE73" />
       </mesh>
     </group>
   );

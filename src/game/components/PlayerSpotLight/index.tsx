@@ -12,15 +12,11 @@ interface Props {
 
 const PlayerSpotLight = ({ radius, playerCount, activePlayer }: Props) => {
   const target = useRef<any>();
-  const [{ position }] = useSpring(() => {
-    const { x, z } = computePlayerMatPosition(
-      radius,
-      playerCount,
-      activePlayer
-    );
-
-    return { position: [x, 0, z], config: config.gentle };
-  }, [playerCount, activePlayer]);
+  /* TODO Fix transition from max index to 0 (it wrap around instead of reversing all the way back to 0) */
+  const [{ angle }] = useSpring(
+    () => ({ angle: activePlayer, config: config.wobbly }),
+    [playerCount, activePlayer]
+  );
 
   return (
     <>
@@ -38,7 +34,13 @@ const PlayerSpotLight = ({ radius, playerCount, activePlayer }: Props) => {
         position={[0, 1, 0]}
         target={target.current}
       />
-      <animated.group ref={target} position={position} />
+      <animated.group
+        ref={target}
+        position={angle.to((angle) => {
+          const { x, z } = computePlayerMatPosition(radius, playerCount, angle);
+          return [x, 0, z];
+        })}
+      />
     </>
   );
 };
