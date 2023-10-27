@@ -14,7 +14,7 @@ const PlayerSpotLight = ({ radius, playerCount, activePlayer }: Props) => {
   const target = useRef<any>();
   /* TODO Fix transition from max index to 0 (it wrap around instead of reversing all the way back to 0) */
   const [{ angle }] = useSpring(
-    () => ({ angle: activePlayer, config: config.wobbly }),
+    () => ({ angle: activePlayer, config: config.slow }),
     [playerCount, activePlayer]
   );
 

@@ -28,6 +28,11 @@ function App() {
           <directionalLight intensity={1.5} position={[0, 1, 0]} castShadow />
           <Game state={state} />
         </Canvas>
+        <div className="fixed top-2 left-2 bg-white/20 rounded overflow-y-auto max-h-[calc(100%-1rem)] p-2">
+          <pre className="text-xs max-w-xs">
+            {JSON.stringify(state, null, 2)}
+          </pre>
+        </div>
       </div>
       {/* <Menu /> */}
     </>
