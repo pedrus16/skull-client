@@ -4,13 +4,15 @@ import {
   Euler,
   Group,
   MathUtils,
+  Object3D,
   Object3DEventMap,
   Vector3,
 } from "three";
 
 import { animated, easings, useSprings } from "@react-spring/three";
 import { Box, Cylinder } from "@react-three/drei";
-import { GroupProps } from "@react-three/fiber";
+import { GroupProps, Vector3 as FiberVector3 } from "@react-three/fiber";
+import { CylinderCollider } from "@react-three/rapier";
 
 const Card = (props: GroupProps) => {
   return (
@@ -23,6 +25,7 @@ const Card = (props: GroupProps) => {
       >
         <meshStandardMaterial color="brown" />
       </Cylinder>
+      <CylinderCollider args={[0.0015, 0.04]} />
     </group>
   );
 };
@@ -51,7 +54,11 @@ const useTransforms = (): [
 };
 
 const PlayerMat = (
-  props: { placedCards: number; revealedCards: number } & GroupProps
+  props: {
+    revealPosition: FiberVector3;
+    placedCards: number;
+    revealedCards: number;
+  } & GroupProps
 ) => {
   const rootRef = useRef<Group<Object3DEventMap>>(null);
   const cardsRef = useRef<Group>(null);
@@ -71,13 +78,27 @@ const PlayerMat = (
     });
   }, [handTransforms, pileTransforms]);
 
+  const centerRef = useRef<Object3D>(null);
+  const revealCurve = useMemo(() => {
+    const start = new Vector3();
+    const end = rootRef.current?.worldToLocal(new Vector3()) || new Vector3();
+
+    return new CubicBezierCurve3(
+      start,
+      new Vector3(0, 0.05, 0).add(start),
+      new Vector3(0, 0.05, 0).add(end),
+      end
+    );
+  }, [props.revealPosition]);
+
   const [springs] = useSprings(
     4,
     (index) => ({
-      t: index < props.placedCards ? 1 : 0,
+      t:
+        3 - index < props.revealedCards ? 2 : index < props.placedCards ? 1 : 0,
       config: { easing: easings.easeOutCubic, duration: 600 },
     }),
-    [props.placedCards, handTransforms, pileTransforms]
+    [props.placedCards, props.revealedCards, handTransforms, pileTransforms]
   );
 
   return (
@@ -105,6 +126,8 @@ const PlayerMat = (
         <object3D position={[0, 0.012, 0]} />
       </group>
 
+      <object3D ref={centerRef} position={[3, 0, 0]} />
+
       <group ref={cardsRef}>
         {springs.map((spring, index) => {
           const from = handTransforms[index]?.rotation || new Euler();
@@ -113,9 +136,13 @@ const PlayerMat = (
           return (
             <animated.mesh
               key={index}
-              position={spring.t.to((t) =>
-                curves[index]?.getPoint(t).toArray()
-              )}
+              position={spring.t.to((t) => {
+                if (t <= 1) {
+                  return curves[index]?.getPoint(t).toArray();
+                }
+
+                return revealCurve.getPoint(t - 1).toArray();
+              })}
               rotation-x={spring.t.to((t) => MathUtils.lerp(from.x, to.x, t))}
               rotation-y={spring.t.to((t) => MathUtils.lerp(from.y, to.y, t))}
               rotation-z={spring.t.to((t) => MathUtils.lerp(from.z, to.z, t))}

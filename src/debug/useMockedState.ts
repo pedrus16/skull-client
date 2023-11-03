@@ -66,6 +66,8 @@ const useMockedState = () => {
           "Place Card": () => {
             setState((prev) =>
               produce(prev, (draft) => {
+                if (draft.players[index].placed_cards >= 4) return;
+
                 draft.players[index].placed_cards += 1;
               })
             );
@@ -73,6 +75,12 @@ const useMockedState = () => {
           "Reveal Rose": () => {
             setState((prev) =>
               produce(prev, (draft) => {
+                if (
+                  (draft.players[index].revealed || 0) >=
+                  draft.players[index].placed_cards
+                )
+                  return;
+
                 draft.players[index].revealed =
                   (draft.players[index].revealed || 0) + 1;
               })
@@ -81,6 +89,12 @@ const useMockedState = () => {
           "Reveal Skull": () => {
             setState((prev) =>
               produce(prev, (draft) => {
+                if (
+                  (draft.players[index].revealed || 0) >=
+                  draft.players[index].placed_cards
+                )
+                  return;
+
                 draft.players[index].revealed =
                   (draft.players[index].revealed || 0) + 1;
               })
@@ -102,6 +116,7 @@ const useMockedState = () => {
             setState((prev) =>
               produce(prev, (draft) => {
                 draft.players[index].placed_cards = 0;
+                draft.players[index].revealed = null;
               })
             );
           },

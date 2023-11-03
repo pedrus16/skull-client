@@ -26,6 +26,7 @@ const Game = ({ state }: Props) => {
             key={index}
             position={[x, 0.0001, z]}
             rotation={[0, angle, 0]}
+            revealPosition={[0, 0, 0]}
             placedCards={player.placed_cards}
             revealedCards={player.revealed || 0}
           />
